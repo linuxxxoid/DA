@@ -117,10 +117,10 @@ void MedianaSearch(int64_t key, std::vector<int64_t>& vec, int64_t l1, int64_t r
              --insecond;
          }
      }
-     length.emplace_back(infirst - l1 + 1);//0
-     length.emplace_back(infirst);//1
-     length.emplace_back(insecond - l2 + 1);//2
-     length.emplace_back(insecond);//3
+     length.emplace_back(infirst - l1 + 1);
+     length.emplace_back(infirst);
+     length.emplace_back(insecond - l2 + 1);
+     length.emplace_back(insecond);
 
     return ;
 }
@@ -181,7 +181,7 @@ void Merge(std::vector<int64_t>& tmp, int64_t l1, int64_t r1, int64_t l2, int64_
         if (min_pos == l2) {
             answer = length[1] ;
         } else if (min_pos == l1) {
-            answer = length[3];//element before answer are smaller
+            answer = length[3];
         }
         res[total] = tmp[answer];
     }
@@ -267,40 +267,21 @@ int main (int argc, char const *argv[]) {
     int64_t depth = log2(std::thread::hardware_concurrency());
 
     bool limiter = (depth == 2) ? false : true;
-    //std::cout << depth;
     
-    std::chrono::time_point<std::chrono::system_clock> start, end;
-    start = std::chrono::system_clock::now();
-    OrdinaryMergeSort(tmp1_1, l1, r1, vec1);
-//    try {
-//        std::thread t1(MergeSortForOne, std::ref(tmp1_1), l1, r1, std::ref(vec1), depth, limiter);
-//        t1.join();
-//    } catch (std::runtime_error &ex) {
-//        std::cerr << ex.what();
-//    }
-    //std::sort(vec1.begin(), vec1.end());
     
-    end = std::chrono::system_clock::now();
-    double elapsed_milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
-    std::cout << "Working time: " << elapsed_milliseconds / 1000 << " seconds" << std::endl;
-    
-    bool flag = true;
-    for (int i =0; i < vec1.size() - 1; ++i) {
-        if (vec1[i+1]>=vec1[i]) { continue;}
-        else {
-            flag = false;
-            break;
-        }
+    try {
+        std::thread t1(MergeSortForOne, std::ref(tmp1_1), l1, r1, std::ref(vec1), depth, limiter);
+        t1.join();
+    } catch (std::runtime_error &ex) {
+        std::cerr << ex.what();
     }
-    if (flag) std::cout << "\nSORTED\n";
-    else std::cout << "\nNOT SORTED\n";
-
+    
     if (argc == 2) {
         std::string filename = "output";
         std::ofstream file(filename);
         if (file.is_open()) {
             for (int i = 0; i < vec1.size(); ++i) {
-                file << i << "  " <<  vec1[i] << std::endl;
+                file << vec1[i] << std::endl;
           }
           file << '\n';
         }
